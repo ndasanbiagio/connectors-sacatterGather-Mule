@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4196ab9a-07bf-47bb-bbf5-5a1db9de4527" basePath="/learnmulesoft" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="scattergathermoduleFlow" doc:id="e1946313-1536-4bc8-99a6-d63b3861f543" >
+		<http:listener doc:name="Listener" doc:id="7cc0dd6f-91be-4703-82a0-6a65c8000698" config-ref="HTTP_Listener_config" path="/scattergather101"/>
+		<logger level="INFO" doc:name="Before SC" doc:id="c2d52efe-693f-4f8e-8621-99df702b7648" message="#[payload]"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="de1903c2-55c6-4af8-89a9-f1a88c118f79" >
+			<route >
+				<set-payload value='#[{&#10;	 "payload01Name": "Mule",&#10;	 "payload01ID": "1",&#10;	 "payload01Location": "Brasil",&#10;	 "payload01Salary": "2000"&#10;}]' doc:name="Payload01" doc:id="d83c9368-1cc5-4daf-8263-d60281575520" />
+				<logger level="INFO" doc:name="Payload 01" doc:id="7517512f-74e9-4fab-bb8b-210886f7b23d" message="Payload 01"/>
+			</route>
+			<route >
+				<set-payload value='#[{&#10;	 "payload02Name": "Soft",&#10;	 "payload02ID": "2",&#10;	 "payload02Location": "Argentina",&#10;	 "payload02Salary": "4000"&#10;}]' doc:name="Payload02" doc:id="155b19ca-165d-4bbd-aea5-f11b0da2ef36" />
+				<logger level="INFO" doc:name="Payload 02" doc:id="c3a038e5-2b1c-4485-b885-73342f8b4aae" message="Payload 02"/>
+			</route>
+			<route >
+				<set-payload value='#[{&#10;	 "payload03Name": "SalesForce",&#10;	 "payload03ID": "3",&#10;	 "payload03Location": "USA",&#10;	 "payload03Salary": "3000"&#10;}]' doc:name="Payload03" doc:id="a2d0d019-e0b2-4db9-a07c-808a4daa4498" />
+				<logger level="INFO" doc:name="Payload 03" doc:id="01c05a7f-5085-46d8-ac4c-02a4ac1b936f" message="Payload 03"/>
+			</route>
+		</scatter-gather>
+		<logger level="INFO" doc:name="Log Final Payload" doc:id="48b6418f-2649-4dd1-a3fd-b5b1020081d1" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
+		<logger level="INFO" doc:name="End SC" doc:id="37955f7f-8bb2-4b1b-9665-441d1578cb89" message="#[payload]"/>
+	</flow>
+</mule>

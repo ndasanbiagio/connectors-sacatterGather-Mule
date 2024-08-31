@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="forEachParallelForEachFlow" doc:id="dab1f9b2-7c35-4073-b5e9-74ee4f3f2452" >
+		<http:listener doc:name="HTTP_Listener" doc:id="ea0a3806-2a2e-46f0-8988-f1f97b17084a" config-ref="HTTP_Listener_config" path="/foreach"/>
+		<logger level="INFO" doc:name="Start Each" doc:id="2f36bcdc-dbed-481e-a9f2-cc80a73f2110" message="Start Each"/>
+		<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;[&#10;	1,&#10;	2,&#10;	3,&#10;	"Mule",&#10;	5&#10;]]' doc:name="Array of Values" doc:id="1c0b4237-9ff4-4b1a-beea-70c484f3fa2e" />
+		<foreach doc:name="For Each" doc:id="f8fc9cb4-8611-4845-8868-eb0064b4b958" collection="#[payload]">
+			<try doc:name="Try" doc:id="485045a4-6af0-4108-8828-f999e7daddba" >
+				<ee:transform doc:name="Add 2 in For each" doc:id="451629d5-6227-4d94-826a-68c8b2fa3d90">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload + 2]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1a52a610-e498-4df1-9f18-6461a91245f7" >
+						<logger level="INFO" doc:name="Logger" doc:id="75469751-671e-46af-9f3c-40e9402491bb" message='#[%dw 2.0&#10;output application/json&#10;---&#10;[&#10;	1,&#10;	2,&#10;	3,&#10;	"Mule",&#10;	5&#10;]]'/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+			<logger level="INFO" doc:name="Print Payload" doc:id="19572672-0eb4-4bac-b75b-3023c99959f7" message="#[payload]"/>
+		</foreach>
+		<ee:transform doc:name="Output after for each" doc:id="f36ac324-d534-472c-983f-313801b8eef5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End for each" doc:id="94a74368-0003-494b-bc80-11ac4f341fa7" message="End for each"/>
+	</flow>
+	<flow name="ParallelForEach" doc:id="6de8f980-157f-446e-9c53-ea490ced9338" >
+		<http:listener doc:name="HTTP_Listener" doc:id="8aade23f-2b9b-4d22-aa6d-a1d8e0b85299" config-ref="HTTP_Listener_config" path="/paralleleach" />
+		<logger level="INFO" doc:name="Start Foreach" doc:id="39957326-34eb-43cf-8ae2-510f10a26a3f" message="Start Foreach"/>
+		<set-payload value="#[25 to 30]" doc:name="25 to 30" doc:id="04f9c441-059a-4e86-b9ec-2fa9eb861f1c" />
+		<parallel-foreach doc:name="Parallel For Each" doc:id="340543c4-4e8b-46ed-956d-92fe58c0bb83" target="outputtoForeach">
+			<ee:transform doc:name="Add in Parallel For each" doc:id="3d21b06b-8349-447d-9491-dfa9164547d5" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload + 2]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="4c8a1ae8-68ef-47b7-b4e5-44f250ed7194" />
+		</parallel-foreach>
+		<ee:transform doc:name="Output after for Parallel each" doc:id="b5375d1e-997b-43c7-92ab-be3d8a8f98dc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Foreach" doc:id="5bd24a08-8f35-4e61-8ae0-e3baea221ca8" />
+	</flow>
+</mule>
